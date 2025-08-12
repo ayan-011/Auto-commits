@@ -1,15 +1,18 @@
 # Auto Commits - Daily GitHub Commits
 
-A full-stack web application that automatically pulls 10 random commits daily from a selected GitHub repository.
+A full-stack web application that automatically creates 10 commits daily in your selected GitHub repository to maintain your contribution streak.
 
 ## Features
 
 - **User Setup**: Enter GitHub username and select from available repositories
+- **Immediate Commit Creation**: Creates 10 actual commits in your repository when selected
+- **GitHub Contribution Updates**: Real commits that appear in your GitHub contribution graph
 - **Automatic Daily Fetching**: Cron job runs daily at 9:00 AM UTC to fetch commits
 - **Random Selection**: Picks 10 random commits from the selected repository
 - **Modern UI**: Built with React, Vite, and Tailwind CSS
 - **Real-time Refresh**: Manual refresh capability for immediate updates
 - **Persistent Storage**: SQLite database stores user preferences and commits
+- **Username Suggestions**: Remembers and suggests previously used usernames
 
 ## Tech Stack
 
@@ -30,6 +33,7 @@ A full-stack web application that automatically pulls 10 random commits daily fr
 
 - Node.js (v16 or higher)
 - npm or yarn
+- GitHub Personal Access Token (for creating actual commits)
 
 ## Installation
 
@@ -50,12 +54,22 @@ A full-stack web application that automatically pulls 10 random commits daily fr
    cd ..
    ```
 
-3. **Set up environment variables** (optional)
+3. **Set up GitHub Personal Access Token**
+   
+   To create actual commits that update your GitHub contribution graph, you need a Personal Access Token:
+   
+   a. Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+   b. Generate a new token with the following permissions:
+      - `repo` (Full control of private repositories)
+      - `public_repo` (Access public repositories)
+   c. Copy the token
+   
+   d. Create a `.env` file:
    ```bash
    cp env.example .env
    ```
    
-   Edit `.env` to add your GitHub personal access token for higher API rate limits:
+   e. Add your token to the `.env` file:
    ```
    GITHUB_TOKEN=your_github_personal_access_token
    ```
@@ -77,13 +91,20 @@ A full-stack web application that automatically pulls 10 random commits daily fr
 
 1. **Open your browser** and navigate to `http://localhost:3000`
 
-2. **Enter a GitHub username** in the input field
+2. **Enter a GitHub username** in the input field (your own username)
 
-3. **Select a repository** from the list of available repositories
+3. **Select a repository** from the list of available repositories (choose a repository you own or have write access to)
 
-4. **View daily commits** - the app will display 10 random commits from your selected repository
+4. **Watch commits being created** - the app will create 10 actual commits in your repository
 
-5. **Manual refresh** - click "Refresh Now" to fetch commits immediately
+5. **Check your GitHub profile** - the commits will appear in your contribution graph
+
+## Important Notes
+
+- **Repository Ownership**: You must own the repository or have write access to create commits
+- **GitHub Token**: Required for creating actual commits. Without a token, the app can only fetch existing commits
+- **Rate Limiting**: GitHub API has rate limits. The app includes delays between commits to avoid hitting limits
+- **Commit Messages**: Commits use realistic messages like "Update documentation", "Fix minor bugs", etc.
 
 ## API Endpoints
 
@@ -91,86 +112,10 @@ A full-stack web application that automatically pulls 10 random commits daily fr
 - `GET /api/repositories/:username` - Get user repositories
 - `POST /api/preferences` - Save user preference
 - `GET /api/commits/:username` - Get daily commits for user
+- `POST /api/create-commits` - Create actual commits in repository
 - `POST /api/trigger-fetch` - Manual trigger for commit fetching
 
 ## Database Schema
 
 ### Users Table
-- `id` - Primary key
-- `username` - GitHub username
-- `repository` - Selected repository name
-- `created_at` - Timestamp
-- `updated_at` - Timestamp
-
-### Commits Table
-- `id` - Primary key
-- `username` - GitHub username
-- `repository` - Repository name
-- `commit_sha` - Commit SHA
-- `commit_message` - Commit message
-- `author_name` - Author name
-- `author_email` - Author email
-- `commit_date` - Commit date
-- `html_url` - GitHub commit URL
-- `fetched_at` - When commit was fetched
-
-## Cron Job
-
-The application runs a daily cron job at 9:00 AM UTC that:
-1. Fetches all registered users
-2. For each user, pulls commits from their selected repository
-3. Randomly selects 10 commits
-4. Stores them in the database
-
-## Development
-
-### Project Structure
-```
-auto-commits/
-├── server/                 # Backend
-│   ├── index.js           # Main server file
-│   ├── database.js        # Database operations
-│   └── github.js          # GitHub API integration
-├── client/                # Frontend
-│   ├── src/
-│   │   ├── components/    # React components
-│   │   ├── utils/         # Utility functions
-│   │   └── App.jsx        # Main app component
-│   └── package.json
-├── package.json           # Root package.json
-└── README.md
-```
-
-### Available Scripts
-
-- `npm run dev` - Start both backend and frontend
-- `npm run server` - Start backend only
-- `npm run client` - Start frontend only
-- `npm run build` - Build frontend for production
-- `npm run install-all` - Install all dependencies
-
-## Deployment
-
-### Backend Deployment
-1. Set environment variables
-2. Run `npm run build` to build the frontend
-3. Start the server with `npm run server`
-
-### Frontend Deployment
-The built frontend files are served by the Express server from the `client/dist` directory.
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
-
-## License
-
-MIT License - see LICENSE file for details
-
-## Support
-
-For issues and questions, please open an issue on GitHub. 
+- `
