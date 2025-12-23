@@ -58,4 +58,18 @@ export const triggerFetch = async (username, repository) => {
   } catch (error) {
     throw new Error(error.response?.data?.error || 'Failed to trigger fetch')
   }
+}
+
+// Create immediate commits for selected repository
+export const createImmediateCommits = async (username, repository, githubToken) => {
+  try {
+    const response = await api.post('/create-commits', { 
+      username, 
+      repository,
+      githubToken 
+    })
+    return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Failed to create commits')
+  }
 } 

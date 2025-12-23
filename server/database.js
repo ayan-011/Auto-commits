@@ -67,7 +67,7 @@ const getDailyCommits = (username) => {
       `SELECT * FROM commits 
        WHERE username = ? 
        ORDER BY fetched_at DESC 
-       LIMIT 10`,
+       LIMIT 5`,
       [username],
       (err, rows) => {
         if (err) {

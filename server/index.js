@@ -5,7 +5,7 @@ const path = require('path');
 require('dotenv').config();
 
 const { initializeDatabase } = require('./database');
-const { fetchUserRepositories, fetchRepositoryCommits } = require('./github');
+const { fetchUserRepositories, fetchRepositoryCommits, createMultipleCommits } = require('./github');
 const { saveUserPreference, getDailyCommits, saveDailyCommits } = require('./database');
 
 const app = express();
@@ -92,7 +92,7 @@ cron.schedule('0 9 * * *', async () => {
         // Select 10 random commits
         const randomCommits = commits
           .sort(() => 0.5 - Math.random())
-          .slice(0, 10)
+          .slice(0, 5)
           .map(commit => ({
             ...commit,
             username: user.username,
@@ -121,7 +121,7 @@ app.post('/api/trigger-fetch', async (req, res) => {
     
     const randomCommits = commits
       .sort(() => 0.5 - Math.random())
-      .slice(0, 10)
+      .slice(0, 5)
       .map(commit => ({
         ...commit,
         username,
@@ -134,6 +134,55 @@ app.post('/api/trigger-fetch', async (req, res) => {
   } catch (error) {
     console.error('Error in manual fetch:', error);
     res.status(500).json({ error: 'Failed to fetch commits' });
+  }
+});
+
+// Create immediate commits for selected repository
+app.post('/api/create-commits', async (req, res) => {
+  try {
+    const { username, repository, githubToken } = req.body;
+    console.log(`Creating immediate commits for ${username}/${repository}`);
+    
+    // Check if GitHub token is provided
+    if (!githubToken) {
+      return res.status(400).json({ 
+        error: 'GitHub token is required. Please provide your GitHub Personal Access Token.',
+        note: 'You can get a token from GitHub Settings → Developer settings → Personal access tokens'
+      });
+    }
+    
+    // Create actual commits in the repository using user's token
+    const commits = await createMultipleCommits(username, repository, 5, githubToken);
+    
+    // Also save to local database for tracking
+    const commitsForStorage = commits.map(commit => ({
+      sha: commit.sha,
+      commit: {
+        message: commit.message,
+        author: {
+          name: username,
+          email: `${username}@users.noreply.github.com`,
+          date: new Date().toISOString()
+        }
+      },
+      html_url: commit.url,
+      username,
+      repository,
+      fetched_at: new Date().toISOString()
+    }));
+    
+    await saveDailyCommits(username, commitsForStorage);
+    console.log(`Created ${commits.length} actual commits for ${username}`);
+    
+    res.json({ 
+      message: 'Commits created successfully in your repository!', 
+      count: commits.length,
+      commits: commits,
+      note: 'These commits will appear in your GitHub contribution graph.'
+    });
+  } catch (error) {
+    console.error('Error creating immediate commits:', error);
+    res.status(500).json({ error: error.message });
   }
 });
 
