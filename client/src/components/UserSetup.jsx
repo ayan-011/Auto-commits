@@ -92,7 +92,11 @@ const UserSetup = ({ onUserSetup }) => {
     try {
       // First save user preference
       await saveUserPreference(username, repo.name)
+<<<<<<< HEAD
       setCommitProgress('Creating 5 commits in your repository...')
+=======
+      setCommitProgress('Creating 10 commits in your repository...')
+>>>>>>> 8b7a4c3c53a9ed6d3681504ed29d5b4a6dda79a1
       
       // Then create immediate commits with user's token
       const result = await createImmediateCommits(username, repo.name, githubToken)
