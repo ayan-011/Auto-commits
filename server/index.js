@@ -190,3 +190,8 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`Daily cron job scheduled for 9:00 AM UTC`);
 }); 
+
+
+
+
+//failed to create commits on 26/1/2026
