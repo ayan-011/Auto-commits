@@ -1,6 +1,6 @@
 # Auto Commits - Daily GitHub Commits
 
-A full-stack web application that automatically creates 10 commits daily in your selected GitHub repository to maintain your contribution streak.
+A full-stack web application that automatically creates 5 commits daily in your selected GitHub repository to maintain your contribution streak.
 
 ## Features
 
